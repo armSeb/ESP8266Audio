@@ -1,6 +1,6 @@
 /*
-  AudioGeneratorAAC
-  Audio output generator using the Helix AAC decoder
+  AudioGeneratorMP3
+  Audio output generator using the Helix MP3 decoder
   
   Copyright (C) 2017  Earle F. Philhower, III
 
@@ -18,25 +18,25 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _AUDIOGENERATORAAC_H
-#define _AUDIOGENERATORAAC_H
+#ifndef _AUDIOGENERATORMP3A_H
+#define _AUDIOGENERATORMP3A_H
 
 #include "AudioGenerator.h"
-#include "libhelix-aac/aacdec.h"
+#include "libhelix-mp3/mp3dec.h"
 
-class AudioGeneratorAAC : public AudioGenerator
+class AudioGeneratorMP3a : public AudioGenerator
 {
   public:
-    AudioGeneratorAAC();
-    virtual ~AudioGeneratorAAC() override;
+    AudioGeneratorMP3a();
+    virtual ~AudioGeneratorMP3a() override;
     virtual bool begin(AudioFileSource *source, AudioOutput *output) override;
     virtual bool loop() override;
     virtual bool stop() override;
     virtual bool isRunning() override;
 
   protected:
-    // Helix AAC decoder
-    HAACDecoder hAACDecoder;
+    // Helix MP3 decoder
+    HMP3Decoder hMP3Decoder;
 
     // Input buffering
     uint8_t buff[1600]; // File buffer required to store at least a whole compressed frame
@@ -45,15 +45,13 @@ class AudioGeneratorAAC : public AudioGenerator
     bool FillBufferWithValidFrame(); // Read until we get a valid syncword and min(feof, 2048) butes in the buffer
 
     // Output buffering
-    int16_t outSample[1024 * 2]; // Interleaved L/R
+    int16_t outSample[1152 * 2]; // Interleaved L/R
     int16_t validSamples;
     int16_t curSample;
 
     // Each frame may change this if they're very strange, I guess
     unsigned int lastRate;
     int lastChannels;
-
 };
 
 #endif
-
