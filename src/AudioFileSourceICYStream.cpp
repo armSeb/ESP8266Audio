@@ -19,8 +19,6 @@
 */
 
 #include "AudioFileSourceICYStream.h"
-#include "AudioFileSourcePROGMEM.h"
-#include "AudioFileStream.h"
 
 AudioFileSourceICYStream::AudioFileSourceICYStream()
 {
@@ -47,7 +45,7 @@ bool AudioFileSourceICYStream::open(const char *url)
   int code = http.GET();
   if (code != HTTP_CODE_OK) {
     http.end();
-    cb.st(STATUS_HTTPFAIL, "Can't open HTTP request");
+    cb.st(STATUS_HTTPFAIL, PSTR("Can't open HTTP request"));
     return false;
   }
   if (http.hasHeader(hdr[0])) {
@@ -123,20 +121,20 @@ uint32_t AudioFileSourceICYStream::readInternal(void *data, uint32_t len, bool n
 {
 retry:
   if (!http.connected()) {
-    cb.st(STATUS_DISCONNECTED, "Stream disconnected");
+    cb.st(STATUS_DISCONNECTED, PSTR("Stream disconnected"));
     http.end();
     for (int i = 0; i < reconnectTries; i++) {
       char buff[32];
-      sprintf(buff, "Attempting to reconnect, try %d", i);
+      sprintf_P(buff, PSTR("Attempting to reconnect, try %d"), i);
       cb.st(STATUS_RECONNECTING, buff);
       delay(reconnectDelayMs);
       if (open(saveURL)) {
-        cb.st(STATUS_RECONNECTED, "Stream reconnected");
+        cb.st(STATUS_RECONNECTED, PSTR("Stream reconnected"));
         break;
       }
     }
     if (!http.connected()) {
-      cb.st(STATUS_DISCONNECTED, "Unable to reconnect");
+      cb.st(STATUS_DISCONNECTED, PSTR("Unable to reconnect"));
       return 0;
     }
   }
@@ -154,7 +152,7 @@ retry:
 
   size_t avail = stream->available();
   if (!nonBlock && !avail) {
-    cb.st(STATUS_NODATA, "No stream data available");
+    cb.st(STATUS_NODATA, PSTR("No stream data available"));
     http.end();
     goto retry;
   }
@@ -209,18 +207,13 @@ retry:
               if (d==';') { mdr.unread(d); break; }
               else { mdr.unread(d); }
             }
-//            if ((c=='\n') || (c=='\r') || (c==' ') || (c=='\t') || (c==0)) continue; // Throw away any whitespace
             *(p++) = c;
           }
           if (c != '\'') {
             // MD data was too long, read and throw away rest
             while ((c != '\'') && !mdr.eof()) mdr.read(&c, 1);
           }
-          {
-            AudioFileSourcePROGMEM afsp(value, strlen(value));
-            AudioFileStream afs(&afsp, strlen(value));
-            cb.md(type, false, &afs);
-          }
+          cb.md(type, false, value);
           do {
             ret = mdr.read(&c, 1);
           } while ((c !=';') && (c!=0) && !mdr.eof());

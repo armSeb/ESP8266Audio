@@ -7,11 +7,20 @@
 // Uncomment to show heap and stack space on entry
 #define stack(a,b,c)
 
+// Helper function to see if we can allocate one chunk on the stack
+# ifdef __cplusplus
+extern "C" {
+# endif
+extern int stackfree();
+# ifdef __cplusplus
+};
+# endif
+
 /* Define to enable experimental code. */
 /* #undef EXPERIMENTAL */
 
 /* Define to 1 if you have the <assert.h> header file. */
-#define HAVE_ASSERT_H 1
+//#define HAVE_ASSERT_H 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
@@ -76,7 +85,7 @@
 #undef HAVE_WAITPID
 
 /* Define to disable debugging assertions. */
-/* #undef NDEBUG */
+#define NDEBUG 1
 
 /* Define to optimize for accuracy over speed. */
 /* #undef OPT_ACCURACY */
@@ -89,7 +98,7 @@
 
 /* Define to influence a strict interpretation of the ISO/IEC standards, even
    if this is in opposition with best accepted practices. */
-/* #undef OPT_STRICT */
+#undef OPT_STRICT
 
 /* Name of package */
 #define PACKAGE "libmad"

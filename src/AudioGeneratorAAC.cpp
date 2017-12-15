@@ -28,7 +28,10 @@ AudioGeneratorAAC::AudioGeneratorAAC()
   file = NULL;
   output = NULL;
   hAACDecoder = AACInitDecoder();
-  if (!hAACDecoder) { Serial.println("Out of memory error! hAACDecoder==NULL"); Serial.flush(); }
+  if (!hAACDecoder) {
+    Serial.printf_P(PSTR("Out of memory error! hAACDecoder==NULL\n"));
+    Serial.flush();
+  }
   // For sanity's sake...
   memset(buff, 0, sizeof(buff));
   memset(outSample, 0, sizeof(outSample));
@@ -109,7 +112,7 @@ bool AudioGeneratorAAC::loop()
     if (ret) {
       // Error, skip the frame...
       char buff[48];
-      sprintf(buff, "AAC decode error %d", ret);
+      sprintf_P(buff, PSTR("AAC decode error %d"), ret);
       cb.st(ret, buff);
     } else {
       lastFrameEnd = buffValid - bytesLeft;
